@@ -2,7 +2,7 @@
 
 Aori is a high-performance orderbook protocol for high-frequency trading on-chain and facilitating OTC settlement. [Order] is our on-chain protocol used to settle [Seaport](https://docs.opensea.io/reference/seaport-overview) orders that were matched via Aori's off-chain orderbook. The surrounding logic can be found within `OrderProtocol.sol`.
 
-This SDK is released under the [MIT License](LICENSE).
+This repo is released under the [MIT License](LICENSE).
 
 ---
 
