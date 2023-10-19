@@ -1690,7 +1690,7 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
     }
 
-        function test_successWholeMultiSwap() public {
+    function test_successWholeMultiSwap() public {
 
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
@@ -1773,6 +1773,167 @@ contract OrderProtocolTest is DSTest {
         fulfillment3.offerComponents[0] = FulfillmentComponent(1, 0);
         fulfillment3.considerationComponents[0] = FulfillmentComponent(0, 1);
         fulfillments.push(fulfillment3);
+
+        /*//////////////////////////////////////////////////////////////
+                                SERVER SIGNATURE
+        //////////////////////////////////////////////////////////////*/
+
+        bytes32 matchingHash = keccak256(
+            abi.encode(
+                advancedOrders,
+                takerOrder,
+                fulfillments,
+                block.number,
+                block.chainid
+            )
+        );
+
+        (uint8 serverV, bytes32 serverR, bytes32 serverS) = vm.sign(
+            SERVER_PRIVATE_KEY,
+            keccak256(
+                abi.encodePacked(
+                    "\x19Ethereum Signed Message:\n32",
+                    matchingHash
+                )
+            )
+        );
+
+        /*//////////////////////////////////////////////////////////////
+                                    SETTLEMENT
+        //////////////////////////////////////////////////////////////*/
+
+        vm.startPrank(MAKER_WALLET);
+        IERC20(address(tokenA)).approve(SEAPORT_ADDRESS, 2 ** 256 - 1);
+        tokenA.mint(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(TAKER_WALLET);
+        IERC20(address(tokenB)).approve(SEAPORT_ADDRESS, 2 ** 256 - 1);
+        tokenB.mint(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(SEARCHER_WALLET);
+        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
+            makerOrders: advancedOrders,
+            takerOrder: takerOrder,
+            fulfillments: fulfillments,
+            blockDeadline: block.number,
+            chainId: block.chainid
+        }), OrderProtocol.Signature({
+            v: serverV,
+            r: serverR,
+            s: serverS
+        }));
+        vm.stopPrank();
+    }
+
+    function test_successDynamicFeeSwap() public {
+
+        /*//////////////////////////////////////////////////////////////
+                                ORDER CREATION
+        //////////////////////////////////////////////////////////////*/
+
+        offerItems.push(_createBaseOfferItemERC20(address(tokenA), 0.9 ether));
+        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.9 ether, MAKER_WALLET));
+
+        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
+        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
+        
+        bytes memory makerSignature = this._signOrder(
+            MAKER_PRIVATE_KEY,
+            orderHasher._getOrderHash(makerOrderComponents)
+        );
+
+        AdvancedOrder memory order1 = AdvancedOrder({
+            parameters: parameters,
+            numerator: 10,
+            denominator: 10,
+            signature: makerSignature,
+            extraData: "0x"
+        });
+        advancedOrders.push(order1);
+
+        /*//////////////////////////////////////////////////////////////
+                                  TAKER ORDER
+        //////////////////////////////////////////////////////////////*/
+
+        // Taker pays 0.9 ether for maker's consideration + 0.1 ether taker fee
+        offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
+        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.9 ether, TAKER_WALLET));
+
+        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
+        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
+        
+        bytes memory takerSignature = this._signOrder(
+            TAKER_PRIVATE_KEY,
+            orderHasher._getOrderHash(takerOrderComponents)
+        );
+
+        AdvancedOrder memory takerOrder = AdvancedOrder({
+            parameters: takerParameters,
+            numerator: 10,
+            denominator: 10,
+            signature: takerSignature,
+            extraData: "0x"
+        });
+
+        /*//////////////////////////////////////////////////////////////
+                               DYNAMIC TAKER FEE
+        //////////////////////////////////////////////////////////////*/
+
+        offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0 ether));
+        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.1 ether, SERVER_WALLET));
+        OrderParameters memory takerFeeParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
+        OrderComponents memory takerFeeComponents =  _getOrderComponents(takerFeeParameters);
+
+        bytes memory takerFeeSignature = this._signOrder(
+            TAKER_PRIVATE_KEY,
+            orderHasher._getOrderHash(takerFeeComponents)
+        );
+
+        AdvancedOrder memory takerFee = AdvancedOrder({
+            parameters: takerFeeParameters,
+            numerator: 10,
+            denominator: 10,
+            signature: takerFeeSignature,
+            extraData: "0x"
+        });
+        advancedOrders.push(takerFee);
+
+        /*//////////////////////////////////////////////////////////////
+                                FULFILLMENTS
+        //////////////////////////////////////////////////////////////*/
+
+        // Apply maker's offer item to the taker's consideration
+        offerFulfillmentComponents.push(FulfillmentComponent(0, 0));
+        considerationFulfillmentComponents.push(FulfillmentComponent(2, 0));
+
+        Fulfillment memory fulfillment = Fulfillment(
+            offerFulfillmentComponents,
+            considerationFulfillmentComponents
+        );
+
+        Fulfillment memory fulfillment2 = Fulfillment(
+            new FulfillmentComponent[](1),
+            new FulfillmentComponent[](2)
+        );
+        
+        // Apply the taker's offer to the maker's considerations
+        fulfillment2.offerComponents[0] = FulfillmentComponent(2, 0);
+        fulfillment2.considerationComponents[0] = FulfillmentComponent(0, 0);
+        fulfillment2.considerationComponents[1] = FulfillmentComponent(1, 0);
+
+        fulfillments.push(fulfillment);
+        fulfillments.push(fulfillment2);
+
+        // Fulfillment memory fulfillment3 = Fulfillment(
+        //     new FulfillmentComponent[](1),
+        //     new FulfillmentComponent[](1)
+        // );
+
+        // fulfillment3.offerComponents[0] = FulfillmentComponent(2, 0);
+        // fulfillment3.considerationComponents[0] = FulfillmentComponent(1, 0);
+        // fulfillments.push(fulfillment3);
 
         /*//////////////////////////////////////////////////////////////
                                 SERVER SIGNATURE
