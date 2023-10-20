@@ -3,22 +3,23 @@ pragma solidity >=0.8.17;
 import {DSTest} from "ds-test/test.sol";
 import {console} from "forge-std/console.sol";
 import {Vm} from "forge-std/Vm.sol";
-import { IERC20 } from "forge-std/interfaces/IERC20.sol";
+import {IERC20} from "forge-std/interfaces/IERC20.sol";
 
-import { SeaportInterface } from "seaport-types/src/interfaces/SeaportInterface.sol";
-import { ConsiderationInterface } from "seaport-types/src/interfaces/ConsiderationInterface.sol";
-import { AdvancedOrder, CriteriaResolver, Fulfillment, FulfillmentComponent, OrderParameters, OfferItem, ConsiderationItem, CriteriaResolver, ItemType, OrderComponents } from "seaport-types/src/lib/ConsiderationStructs.sol";
-import { OrderType, Side } from "seaport-types/src/lib/ConsiderationEnums.sol";
+import {SeaportInterface} from "seaport-types/src/interfaces/SeaportInterface.sol";
+import {ConsiderationInterface} from "seaport-types/src/interfaces/ConsiderationInterface.sol";
+import {AdvancedOrder, CriteriaResolver, Fulfillment, FulfillmentComponent, OrderParameters, OfferItem, ConsiderationItem, CriteriaResolver, ItemType, OrderComponents} from "seaport-types/src/lib/ConsiderationStructs.sol";
+import {OrderType, Side} from "seaport-types/src/lib/ConsiderationEnums.sol";
 
-import { OrderProtocol } from "../src/OrderProtocol.sol";
+import {OrderProtocol} from "../src/OrderProtocol.sol";
 
-import { SimpleToken } from "./mocks/SimpleToken.sol";
+import {SimpleToken} from "./mocks/SimpleToken.sol";
 
-import { OrderHasher } from "./utils/OrderHasher.sol";
+import {OrderHasher} from "./utils/OrderHasher.sol";
 
 contract OrderProtocolTest is DSTest {
     Vm internal vm = Vm(HEVM_ADDRESS);
-    address constant SEAPORT_ADDRESS = 0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC;
+    address constant SEAPORT_ADDRESS =
+        0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC;
     OrderProtocol internal orderProtocol;
 
     bytes32 internal _OFFER_ITEM_TYPEHASH;
@@ -28,7 +29,7 @@ contract OrderProtocolTest is DSTest {
     /*//////////////////////////////////////////////////////////////
                                  USERS
     //////////////////////////////////////////////////////////////*/
-    
+
     uint256 FAKE_ORDER_PROTOCOL_KEY = 69;
     uint256 SERVER_PRIVATE_KEY = 1;
     uint256 FAKE_SERVER_PRIVATE_KEY = 2;
@@ -88,17 +89,27 @@ contract OrderProtocolTest is DSTest {
     }
 
     function test_failFakeServerSignature() public {
-        
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -118,11 +129,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -148,7 +170,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -182,7 +204,6 @@ contract OrderProtocolTest is DSTest {
             )
         );
 
-
         /*//////////////////////////////////////////////////////////////
                                     SETTLEMENT
         //////////////////////////////////////////////////////////////*/
@@ -198,33 +219,48 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        vm.expectRevert("Server signature does not correspond to order details");
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: fakeServerV,
-            r: fakeServerR,
-            s: fakeServerS
-        }));
-        vm.stopPrank();        
+        vm.expectRevert(
+            "Server signature does not correspond to order details"
+        );
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({
+                v: fakeServerV,
+                r: fakeServerR,
+                s: fakeServerS
+            })
+        );
+        vm.stopPrank();
     }
 
-     function test_failChainIdBlockDeadlineExpired() public {
-
+    function test_failChainIdBlockDeadlineExpired() public {
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -244,11 +280,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -274,7 +321,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -308,7 +355,6 @@ contract OrderProtocolTest is DSTest {
             )
         );
 
-
         /*//////////////////////////////////////////////////////////////
                                     SETTLEMENT
         //////////////////////////////////////////////////////////////*/
@@ -325,32 +371,41 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("Order execution deadline has passed");
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number - 1,
-            chainId: 69420
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number - 1,
+                chainId: 69420
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_failChainIdWrongChainId() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -370,11 +425,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -400,7 +466,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -434,7 +500,6 @@ contract OrderProtocolTest is DSTest {
             )
         );
 
-
         /*//////////////////////////////////////////////////////////////
                                     SETTLEMENT
         //////////////////////////////////////////////////////////////*/
@@ -451,17 +516,16 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("Order is not valid for this chain");
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: 69420
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: 69420
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
@@ -471,11 +535,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -495,11 +570,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             FAKE_TAKER_PRIVATE_KEY, // Note: here is the fake private key!
             orderHasher._getOrderHash(takerOrderComponents)
@@ -525,7 +611,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -575,32 +661,41 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert(bytes4(0x815e1d64)); // Encoded selector for InvalidSigner()
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_failEmptyMakerOrders() public {
-
         /*//////////////////////////////////////////////////////////////
                                   TAKER ORDER
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -626,7 +721,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -676,31 +771,41 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert(bytes4(0x7fda7279)); // InvalidFulfillmentComponentData()
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_failMakerNotApprovedTokens() public {
-         /*//////////////////////////////////////////////////////////////
+        /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -720,11 +825,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -750,7 +866,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -801,31 +917,41 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("ERC20: insufficient allowance");
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
-    
+
     function test_failTakerNotApprovedTokens() public {
-         /*//////////////////////////////////////////////////////////////
+        /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -845,11 +971,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -875,7 +1012,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -925,31 +1062,41 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("ERC20: insufficient allowance");
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_failEmptyFulfillment() public {
-         /*//////////////////////////////////////////////////////////////
+        /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -969,11 +1116,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1035,31 +1193,41 @@ contract OrderProtocolTest is DSTest {
         // TODO: fix
         // vm.expectRevert(bytes4(0xa5f54208)); // ConsiderationNotMet(uint256,uint256,uint256)
         vm.expectRevert();
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_failFulfillmentForNoneExistent() public {
-         /*//////////////////////////////////////////////////////////////
+        /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1079,11 +1247,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1109,7 +1288,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -1158,20 +1337,19 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        // TODO: 
+        // TODO:
         // vm.expectRevert("bced929d");
         vm.expectRevert();
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
@@ -1181,11 +1359,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1205,11 +1394,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0.8 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1235,7 +1435,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -1286,17 +1486,16 @@ contract OrderProtocolTest is DSTest {
         vm.startPrank(SEARCHER_WALLET);
         // vm.expectRevert("0xa5f54208"); // ConsiderationNotMet(uint256,uint256,uint256)
         vm.expectRevert();
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
@@ -1306,11 +1505,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1330,11 +1540,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0.9 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.9 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                0.9 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1360,7 +1581,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -1409,17 +1630,16 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
 
         assertEq(IERC20(address(tokenA)).balanceOf(MAKER_WALLET), 0.1 ether);
@@ -1430,17 +1650,27 @@ contract OrderProtocolTest is DSTest {
     }
 
     function test_successSimpleSwap() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1460,11 +1690,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1490,7 +1731,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -1539,33 +1780,48 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_successPartialMultiSwap() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.9 ether, MAKER_WALLET));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.1 ether, SERVER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                0.9 ether,
+                MAKER_WALLET
+            )
+        );
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                0.1 ether,
+                SERVER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1585,11 +1841,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0.5 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.5 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                0.5 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1620,7 +1887,7 @@ contract OrderProtocolTest is DSTest {
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
-        
+
         // Apply the taker's offer to the maker's considerations
         fulfillment2.offerComponents[0] = FulfillmentComponent(1, 0);
         fulfillment2.considerationComponents[0] = FulfillmentComponent(0, 0);
@@ -1676,33 +1943,48 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_successWholeMultiSwap() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.9 ether, MAKER_WALLET));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.1 ether, SERVER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                0.9 ether,
+                MAKER_WALLET
+            )
+        );
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                0.1 ether,
+                SERVER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1722,11 +2004,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -1757,7 +2050,7 @@ contract OrderProtocolTest is DSTest {
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
-        
+
         // Apply the taker's offer to the maker's considerations
         fulfillment2.offerComponents[0] = FulfillmentComponent(1, 0);
         fulfillment2.considerationComponents[0] = FulfillmentComponent(0, 0);
@@ -1813,32 +2106,41 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
     function test_successDynamicFeeSwap() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 0.9 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 0.9 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                0.9 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -1859,15 +2161,38 @@ contract OrderProtocolTest is DSTest {
 
         // Taker pays 0.9 ether for maker's consideration + 0.1 ether taker fee
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.9 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                0.9 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
         );
+
+        considerationItems.push(_createBaseConsiderationItemERC20(
+            address(tokenA),
+            0.05 ether,
+            SERVER_WALLET
+        ));
+
+        considerationItems.push(_createBaseConsiderationItemERC20(
+            address(tokenA),
+            0.05 ether,
+            FAKE_SERVER_WALLET
+        ));
 
         AdvancedOrder memory takerOrder = AdvancedOrder({
             parameters: takerParameters,
@@ -1876,29 +2201,40 @@ contract OrderProtocolTest is DSTest {
             signature: takerSignature,
             extraData: "0x"
         });
+        
+        // /*//////////////////////////////////////////////////////////////
+        //                        DYNAMIC TAKER FEE
+        // //////////////////////////////////////////////////////////////*/
 
-        /*//////////////////////////////////////////////////////////////
-                               DYNAMIC TAKER FEE
-        //////////////////////////////////////////////////////////////*/
+        // offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0 ether));
+        // considerationItems.push(
+        //     _createBaseConsiderationItemERC20(
+        //         address(tokenA),
+        //         0.1 ether,
+        //         SERVER_WALLET
+        //     )
+        // );
+        // OrderParameters memory takerFeeParameters = _createBaseOrderParameters(
+        //     TAKER_WALLET,
+        //     address(orderProtocol)
+        // );
+        // OrderComponents memory takerFeeComponents = _getOrderComponents(
+        //     takerFeeParameters
+        // );
 
-        offerItems.push(_createBaseOfferItemERC20(address(tokenB), 0 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 0.1 ether, SERVER_WALLET));
-        OrderParameters memory takerFeeParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerFeeComponents =  _getOrderComponents(takerFeeParameters);
+        // bytes memory takerFeeSignature = this._signOrder(
+        //     TAKER_PRIVATE_KEY,
+        //     orderHasher._getOrderHash(takerFeeComponents)
+        // );
 
-        bytes memory takerFeeSignature = this._signOrder(
-            TAKER_PRIVATE_KEY,
-            orderHasher._getOrderHash(takerFeeComponents)
-        );
-
-        AdvancedOrder memory takerFee = AdvancedOrder({
-            parameters: takerFeeParameters,
-            numerator: 10,
-            denominator: 10,
-            signature: takerFeeSignature,
-            extraData: "0x"
-        });
-        advancedOrders.push(takerFee);
+        // AdvancedOrder memory takerFee = AdvancedOrder({
+        //     parameters: takerFeeParameters,
+        //     numerator: 10,
+        //     denominator: 10,
+        //     signature: takerFeeSignature,
+        //     extraData: "0x"
+        // });
+        // advancedOrders.push(takerFee);
 
         /*//////////////////////////////////////////////////////////////
                                 FULFILLMENTS
@@ -1906,7 +2242,7 @@ contract OrderProtocolTest is DSTest {
 
         // Apply maker's offer item to the taker's consideration
         offerFulfillmentComponents.push(FulfillmentComponent(0, 0));
-        considerationFulfillmentComponents.push(FulfillmentComponent(2, 0));
+        considerationFulfillmentComponents.push(FulfillmentComponent(1, 0));
 
         Fulfillment memory fulfillment = Fulfillment(
             offerFulfillmentComponents,
@@ -1915,25 +2251,33 @@ contract OrderProtocolTest is DSTest {
 
         Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
-            new FulfillmentComponent[](2)
+            new FulfillmentComponent[](1)
         );
-        
+
         // Apply the taker's offer to the maker's considerations
-        fulfillment2.offerComponents[0] = FulfillmentComponent(2, 0);
+        fulfillment2.offerComponents[0] = FulfillmentComponent(1, 0);
         fulfillment2.considerationComponents[0] = FulfillmentComponent(0, 0);
-        fulfillment2.considerationComponents[1] = FulfillmentComponent(1, 0);
 
         fulfillments.push(fulfillment);
         fulfillments.push(fulfillment2);
 
-        // Fulfillment memory fulfillment3 = Fulfillment(
-        //     new FulfillmentComponent[](1),
-        //     new FulfillmentComponent[](1)
-        // );
+        Fulfillment memory fulfillment3 = Fulfillment(
+            new FulfillmentComponent[](1),
+            new FulfillmentComponent[](1)
+        );
 
-        // fulfillment3.offerComponents[0] = FulfillmentComponent(2, 0);
-        // fulfillment3.considerationComponents[0] = FulfillmentComponent(1, 0);
-        // fulfillments.push(fulfillment3);
+        fulfillment3.offerComponents[0] = FulfillmentComponent(1, 0);
+        fulfillment3.considerationComponents[0] = FulfillmentComponent(1, 1);
+        fulfillments.push(fulfillment3);
+
+        Fulfillment memory fulfillment4 = Fulfillment(
+            new FulfillmentComponent[](1),
+            new FulfillmentComponent[](1)
+        );
+
+        fulfillment4.offerComponents[0] = FulfillmentComponent(1, 0);
+        fulfillment4.considerationComponents[0] = FulfillmentComponent(1, 2);
+        fulfillments.push(fulfillment4);
 
         /*//////////////////////////////////////////////////////////////
                                 SERVER SIGNATURE
@@ -1974,17 +2318,16 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(OrderProtocol.MatchingDetails({
-            makerOrders: advancedOrders,
-            takerOrder: takerOrder,
-            fulfillments: fulfillments,
-            blockDeadline: block.number,
-            chainId: block.chainid
-        }), OrderProtocol.Signature({
-            v: serverV,
-            r: serverR,
-            s: serverS
-        }));
+        orderProtocol.settleOrders(
+            OrderProtocol.MatchingDetails({
+                makerOrders: advancedOrders,
+                takerOrder: takerOrder,
+                fulfillments: fulfillments,
+                blockDeadline: block.number,
+                chainId: block.chainid
+            }),
+            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+        );
         vm.stopPrank();
     }
 
@@ -1993,17 +2336,27 @@ contract OrderProtocolTest is DSTest {
     //////////////////////////////////////////////////////////////*/
 
     function test_failSignatureReplayAttackMakerExecute() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -2023,11 +2376,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -2053,7 +2417,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -2115,17 +2479,27 @@ contract OrderProtocolTest is DSTest {
     }
 
     function test_failSignatureReplayAttackTakerExecute() public {
-
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -2145,11 +2519,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -2175,7 +2560,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -2236,18 +2621,28 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
     }
 
-     function test_failSignatureReplayAttackTakerExecuteMakerRecipient() public {
-
+    function test_failSignatureReplayAttackTakerExecuteMakerRecipient() public {
         /*//////////////////////////////////////////////////////////////
                                 ORDER CREATION
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenA), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenB), 1 ether, MAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenB),
+                1 ether,
+                MAKER_WALLET
+            )
+        );
 
-        OrderParameters memory parameters = _createBaseOrderParameters(MAKER_WALLET, address(orderProtocol));
-        OrderComponents memory makerOrderComponents = _getOrderComponents(parameters);
-        
+        OrderParameters memory parameters = _createBaseOrderParameters(
+            MAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory makerOrderComponents = _getOrderComponents(
+            parameters
+        );
+
         bytes memory makerSignature = this._signOrder(
             MAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(makerOrderComponents)
@@ -2267,11 +2662,22 @@ contract OrderProtocolTest is DSTest {
         //////////////////////////////////////////////////////////////*/
 
         offerItems.push(_createBaseOfferItemERC20(address(tokenB), 1 ether));
-        considerationItems.push(_createBaseConsiderationItemERC20(address(tokenA), 1 ether, TAKER_WALLET));
+        considerationItems.push(
+            _createBaseConsiderationItemERC20(
+                address(tokenA),
+                1 ether,
+                TAKER_WALLET
+            )
+        );
 
-        OrderParameters memory takerParameters = _createBaseOrderParameters(TAKER_WALLET, address(orderProtocol));
-        OrderComponents memory takerOrderComponents = _getOrderComponents(takerParameters);
-        
+        OrderParameters memory takerParameters = _createBaseOrderParameters(
+            TAKER_WALLET,
+            address(orderProtocol)
+        );
+        OrderComponents memory takerOrderComponents = _getOrderComponents(
+            takerParameters
+        );
+
         bytes memory takerSignature = this._signOrder(
             TAKER_PRIVATE_KEY,
             orderHasher._getOrderHash(takerOrderComponents)
@@ -2297,7 +2703,7 @@ contract OrderProtocolTest is DSTest {
             considerationFulfillmentComponents
         );
 
-         Fulfillment memory fulfillment2 = Fulfillment(
+        Fulfillment memory fulfillment2 = Fulfillment(
             new FulfillmentComponent[](1),
             new FulfillmentComponent[](1)
         );
@@ -2362,28 +2768,40 @@ contract OrderProtocolTest is DSTest {
                                 HELPERS
     //////////////////////////////////////////////////////////////*/
 
-    function _createBaseOfferItemERC20(address _tokenAddress, uint256 _amount) internal pure returns (OfferItem memory) {
-        return OfferItem({
-            itemType: ItemType.ERC20,
-            token: _tokenAddress,
-            identifierOrCriteria: 0,
-            startAmount: _amount,
-            endAmount: _amount
-        });
+    function _createBaseOfferItemERC20(
+        address _tokenAddress,
+        uint256 _amount
+    ) internal pure returns (OfferItem memory) {
+        return
+            OfferItem({
+                itemType: ItemType.ERC20,
+                token: _tokenAddress,
+                identifierOrCriteria: 0,
+                startAmount: _amount,
+                endAmount: _amount
+            });
     }
 
-    function _createBaseConsiderationItemERC20(address _tokenAddress, uint256 _amount, address _recipient) internal pure returns (ConsiderationItem memory) {
-        return ConsiderationItem({
-            itemType: ItemType.ERC20,
-            token: _tokenAddress,
-            identifierOrCriteria: 0,
-            startAmount: _amount,
-            endAmount: _amount,
-            recipient: payable(_recipient)
-        });
+    function _createBaseConsiderationItemERC20(
+        address _tokenAddress,
+        uint256 _amount,
+        address _recipient
+    ) internal pure returns (ConsiderationItem memory) {
+        return
+            ConsiderationItem({
+                itemType: ItemType.ERC20,
+                token: _tokenAddress,
+                identifierOrCriteria: 0,
+                startAmount: _amount,
+                endAmount: _amount,
+                recipient: payable(_recipient)
+            });
     }
 
-    function _createBaseOrderParameters(address _offerer, address _zone) internal returns (OrderParameters memory) {
+    function _createBaseOrderParameters(
+        address _offerer,
+        address _zone
+    ) internal returns (OrderParameters memory) {
         OrderParameters memory parameters = OrderParameters({
             offerer: _offerer,
             zone: _zone,
