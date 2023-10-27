@@ -29,8 +29,10 @@ forge build
 ### Testing
 
 ```
-forge test
+forge test --fork-url https://rpc.ankr.com/eth --via-ir
 ```
+
+You can also test using the `make` command which will run the above command.
 
 ### Contract deployment
 
@@ -39,8 +41,9 @@ Please create a `.env` file before deployment. An example can be found in `.env.
 #### Dryrun
 
 ```
-forge script script/Deploy.s.sol -f [network]
+forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.ankr.com/eth_goerli --via-ir
 ```
+You can also do a dry fun by using the `make test-deploy` command which will run the above command.
 
 ### Live
 

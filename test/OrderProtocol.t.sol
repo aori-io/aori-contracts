@@ -69,7 +69,7 @@ contract OrderProtocolTest is DSTest {
 
     function setUp() public {
         vm.prank(SERVER_WALLET);
-        orderProtocol = new OrderProtocol(SEAPORT_ADDRESS);
+        orderProtocol = new OrderProtocol(SERVER_WALLET, SEAPORT_ADDRESS);
 
         vm.label(address(orderProtocol), "Order Protocol");
         vm.label(FAKE_ORDER_PROTOCOL, "Fake Order Protocol");

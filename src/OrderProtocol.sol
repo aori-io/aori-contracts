@@ -41,8 +41,8 @@ contract OrderProtocol {
                               CONSTRUCTOR
     //////////////////////////////////////////////////////////////*/
 
-    constructor(address _seaport) {
-        owner = msg.sender;
+    constructor(address _owner, address _seaport) {
+        owner = _owner;
         seaport = _seaport;
     }
 
