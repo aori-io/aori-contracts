@@ -10,6 +10,12 @@ This repo is released under the [MIT License](LICENSE).
 
 If you have any further questions, refer to [the technical documentation](https://www.aori.io/developers). Alternatively, please reach out to us [on Discord](https://discord.gg/K37wkh2ZfR) or [on Twitter](https://twitter.com/aori_io).
 
+## Deployments
+| Network | Deployment Address |
+| ------- | ------------------ |
+| `Goerli (5)` | [0x481ee69BafFE1A737fd2aE0F5487C1f55eCb29DE](https://goerli.etherscan.io/address/0x481ee69baffe1a737fd2ae0f5487c1f55ecb29de) |
+| `Sepolia(11155111)` | [0x481ee69BafFE1A737fd2aE0F5487C1f55eCb29DE](https://sepolia.etherscan.io/address/0x481ee69baffe1a737fd2ae0f5487c1f55ecb29de) |
+
 ## Local development
 
 This project uses [Foundry](https://github.com/gakonst/foundry) as the development framework.
