@@ -10,17 +10,17 @@ import {ConsiderationInterface} from "seaport-types/src/interfaces/Consideration
 import {AdvancedOrder, CriteriaResolver, Fulfillment, FulfillmentComponent, OrderParameters, OfferItem, ConsiderationItem, CriteriaResolver, ItemType, OrderComponents} from "seaport-types/src/lib/ConsiderationStructs.sol";
 import {OrderType, Side} from "seaport-types/src/lib/ConsiderationEnums.sol";
 
-import {OrderProtocol} from "../src/OrderProtocol.sol";
+import {AoriProtocol} from "../src/AoriProtocol.sol";
 
 import {SimpleToken} from "./mocks/SimpleToken.sol";
 
 import {OrderHasher} from "./utils/OrderHasher.sol";
 
-contract OrderProtocolTest is DSTest {
+contract AoriProtocolTest is DSTest {
     Vm internal vm = Vm(HEVM_ADDRESS);
     address constant SEAPORT_ADDRESS =
         0x00000000000000ADc04C56Bf30aC9d3c0aAF14dC;
-    OrderProtocol internal orderProtocol;
+    AoriProtocol internal aoriProtocol;
 
     bytes32 internal _OFFER_ITEM_TYPEHASH;
     bytes32 internal _CONSIDERATION_ITEM_TYPEHASH;
@@ -69,9 +69,9 @@ contract OrderProtocolTest is DSTest {
 
     function setUp() public {
         vm.prank(SERVER_WALLET);
-        orderProtocol = new OrderProtocol(SERVER_WALLET, SEAPORT_ADDRESS);
+        aoriProtocol = new AoriProtocol(SERVER_WALLET, SEAPORT_ADDRESS);
 
-        vm.label(address(orderProtocol), "Order Protocol");
+        vm.label(address(aoriProtocol), "Order Protocol");
         vm.label(FAKE_ORDER_PROTOCOL, "Fake Order Protocol");
         vm.label(SEAPORT_ADDRESS, "Seaport Deployment");
 
@@ -104,7 +104,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -139,7 +139,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -222,15 +222,15 @@ contract OrderProtocolTest is DSTest {
         vm.expectRevert(
             "Server signature does not correspond to order details"
         );
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({
+            AoriProtocol.Signature({
                 v: fakeServerV,
                 r: fakeServerR,
                 s: fakeServerS
@@ -255,7 +255,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -290,7 +290,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -371,15 +371,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("Order execution deadline has passed");
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number - 1,
                 chainId: 69420
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -400,7 +400,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -435,7 +435,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -516,15 +516,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("Order is not valid for this chain");
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: 69420
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -545,7 +545,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -580,7 +580,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -661,15 +661,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert(bytes4(0x815e1d64)); // Encoded selector for InvalidSigner()
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -690,7 +690,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -771,15 +771,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert(bytes4(0x7fda7279)); // InvalidFulfillmentComponentData()
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -800,7 +800,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -835,7 +835,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -917,15 +917,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("ERC20: insufficient allowance");
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -946,7 +946,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -981,7 +981,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1062,15 +1062,15 @@ contract OrderProtocolTest is DSTest {
 
         vm.startPrank(SEARCHER_WALLET);
         vm.expectRevert("ERC20: insufficient allowance");
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1091,7 +1091,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1126,7 +1126,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1193,15 +1193,15 @@ contract OrderProtocolTest is DSTest {
         // TODO: fix
         // vm.expectRevert(bytes4(0xa5f54208)); // ConsiderationNotMet(uint256,uint256,uint256)
         vm.expectRevert();
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1222,7 +1222,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1257,7 +1257,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1340,15 +1340,15 @@ contract OrderProtocolTest is DSTest {
         // TODO:
         // vm.expectRevert("bced929d");
         vm.expectRevert();
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1369,7 +1369,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1404,7 +1404,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1486,15 +1486,15 @@ contract OrderProtocolTest is DSTest {
         vm.startPrank(SEARCHER_WALLET);
         // vm.expectRevert("0xa5f54208"); // ConsiderationNotMet(uint256,uint256,uint256)
         vm.expectRevert();
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1515,7 +1515,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1550,7 +1550,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1630,15 +1630,15 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
 
@@ -1665,7 +1665,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1700,7 +1700,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1780,15 +1780,15 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1816,7 +1816,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -1851,7 +1851,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -1943,15 +1943,15 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -1979,7 +1979,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -2014,7 +2014,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -2106,15 +2106,15 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -2135,7 +2135,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -2171,7 +2171,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -2216,7 +2216,7 @@ contract OrderProtocolTest is DSTest {
         // );
         // OrderParameters memory takerFeeParameters = _createBaseOrderParameters(
         //     TAKER_WALLET,
-        //     address(orderProtocol)
+        //     address(aoriProtocol)
         // );
         // OrderComponents memory takerFeeComponents = _getOrderComponents(
         //     takerFeeParameters
@@ -2318,15 +2318,15 @@ contract OrderProtocolTest is DSTest {
         vm.stopPrank();
 
         vm.startPrank(SEARCHER_WALLET);
-        orderProtocol.settleOrders(
-            OrderProtocol.MatchingDetails({
+        aoriProtocol.settleOrders(
+            AoriProtocol.MatchingDetails({
                 makerOrders: advancedOrders,
                 takerOrder: takerOrder,
                 fulfillments: fulfillments,
                 blockDeadline: block.number,
                 chainId: block.chainid
             }),
-            OrderProtocol.Signature({v: serverV, r: serverR, s: serverS})
+            AoriProtocol.Signature({v: serverV, r: serverR, s: serverS})
         );
         vm.stopPrank();
     }
@@ -2351,7 +2351,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -2386,7 +2386,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -2494,7 +2494,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -2529,7 +2529,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters
@@ -2637,7 +2637,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory parameters = _createBaseOrderParameters(
             MAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory makerOrderComponents = _getOrderComponents(
             parameters
@@ -2672,7 +2672,7 @@ contract OrderProtocolTest is DSTest {
 
         OrderParameters memory takerParameters = _createBaseOrderParameters(
             TAKER_WALLET,
-            address(orderProtocol)
+            address(aoriProtocol)
         );
         OrderComponents memory takerOrderComponents = _getOrderComponents(
             takerParameters

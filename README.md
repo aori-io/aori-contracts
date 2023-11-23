@@ -1,10 +1,12 @@
-# [Order]: Aori's Settlement Layer
+# The Aori Smart Contract
 
 ![.](assets/aori.svg)
 
-Aori is a high-performance orderbook protocol for high-frequency trading on-chain and facilitating OTC settlement. [Order] is our on-chain protocol used to settle [Seaport](https://docs.opensea.io/reference/seaport-overview) orders that were matched via Aori's off-chain orderbook. The surrounding logic can be found within `OrderProtocol.sol`.
+Aori is a high-performance orderbook protocol for high-frequency trading on-chain and facilitating OTC settlement. A part of our protocol is our on-chain settlement contract used to settle [Seaport](https://docs.opensea.io/reference/seaport-overview) orders that were matched via Aori's off-chain orderbook. The surrounding logic can be found within the single file `AoriProtocol.sol`.
 
 This repo is released under the [MIT License](LICENSE).
+
+You can read more about the protocol in our litepaper [here](https://aori-io.notion.site/Aori-A-Litepaper-62f809b5c25c4798ad2c1d48d883e7bd?pvs=4).
 
 ---
 

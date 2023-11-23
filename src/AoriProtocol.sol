@@ -18,7 +18,7 @@ pragma solidity ^0.8.19;
 import {SeaportInterface} from "seaport-types/src/interfaces/SeaportInterface.sol";
 import {AdvancedOrder, CriteriaResolver, Fulfillment, OrderParameters, OrderComponents} from "seaport-types/src/lib/ConsiderationStructs.sol";
 
-contract OrderProtocol {
+contract AoriProtocol {
     /*//////////////////////////////////////////////////////////////
                             STATE VARIABLES
     //////////////////////////////////////////////////////////////*/
