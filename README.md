@@ -15,6 +15,7 @@ If you have any further questions, refer to [the technical documentation](https:
 ## Deployments
 | Network | Deployment Address |
 | ------- | ------------------ |
+| `Mainnet (1)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Goerli (5)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Sepolia(11155111)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://sepolia.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 
