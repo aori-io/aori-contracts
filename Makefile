@@ -1,5 +1,5 @@
 tests:
-	forge test --fork-url https://rpc.ankr.com/eth --via-ir
+	forge test --fork-url https://rpc.ankr.com/eth --via-ir --match-path test/AoriProtocol.t.sol
 test-deploy-sepolia:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://ethereum-sepolia.publicnode.com --via-ir
 test-deploy-goerli:
