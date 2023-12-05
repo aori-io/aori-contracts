@@ -10,3 +10,5 @@ test-deploy-polygon-mainnet:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://polygon.llamarpc.com --via-ir
 test-deploy-avalanche:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://avalanche.drpc.org --via-ir
+test-deploy-arbitrum:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://arbitrum.llamarpc.com --via-ir
