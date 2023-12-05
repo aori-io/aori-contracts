@@ -8,3 +8,5 @@ test-deploy-mainnet:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.ankr.com/eth --via-ir
 test-deploy-polygon-mainnet:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://polygon.llamarpc.com --via-ir
+test-deploy-avalanche:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://avalanche.drpc.org --via-ir
