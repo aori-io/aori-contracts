@@ -12,3 +12,5 @@ test-deploy-avalanche:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://avalanche.drpc.org --via-ir
 test-deploy-arbitrum:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://arbitrum.llamarpc.com --via-ir
+test-deploy-optimism:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://optimism.llamarpc.com --via-ir

@@ -17,6 +17,7 @@ If you have any further questions, refer to [the technical documentation](https:
 | ------- | ------------------ |
 | `Mainnet (1)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Goerli (5)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Optimism (10)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://optimistic.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum (42161)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Avalanche (43114)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://snowtrace.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
