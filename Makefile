@@ -20,6 +20,8 @@ test-deploy-base:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://base.drpc.org --via-ir
 test-deploy-fantom:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.fantom.network --via-ir
+test-deploy-celo:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://forno.celo.org --via-ir --broadcast
 
 # Testnets
 test-deploy-arbitrum-goerli:
