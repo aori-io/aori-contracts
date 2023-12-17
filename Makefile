@@ -21,7 +21,9 @@ test-deploy-base:
 test-deploy-fantom:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.fantom.network --via-ir
 test-deploy-celo:
-	forge script script/Deploy.s.sol:DeployScript --fork-url https://forno.celo.org --via-ir --broadcast
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://forno.celo.org --via-ir
+test-deploy-gnosis:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.ankr.com/gnosis --via-ir
 
 # Testnets
 test-deploy-arbitrum-goerli:

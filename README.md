@@ -19,6 +19,7 @@ If you have any further questions, refer to [the technical documentation](https:
 | ------- | ------------------ |
 | `Mainnet (1)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Optimism (10)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://optimistic.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Gnosis (100)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://gnosisscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Fantom (250)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://ftmscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Base (8453)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://basescan.org/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
