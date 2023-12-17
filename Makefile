@@ -24,6 +24,8 @@ test-deploy-celo:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://forno.celo.org --via-ir
 test-deploy-gnosis:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.ankr.com/gnosis --via-ir
+test-deploy-canto:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://canto.slingshot.finance --via-ir
 
 # Testnets
 test-deploy-arbitrum-goerli:

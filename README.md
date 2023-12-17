@@ -22,6 +22,7 @@ If you have any further questions, refer to [the technical documentation](https:
 | `Gnosis (100)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://gnosisscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Fantom (250)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://ftmscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Canto (7700)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://cantoscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Base (8453)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://basescan.org/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum (42161)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Celo (42220)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://celoscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
