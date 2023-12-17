@@ -21,6 +21,7 @@ If you have any further questions, refer to [the technical documentation](https:
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum (42161)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Avalanche (43114)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://snowtrace.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Polygon Mumbai (80001)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://mumbai.polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum Goerli (421613)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Sepolia (11155111)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://sepolia.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 
