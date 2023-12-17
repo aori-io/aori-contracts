@@ -13,16 +13,22 @@ You can read more about the protocol in our litepaper [here](https://aori-io.not
 If you have any further questions, refer to [the technical documentation](https://www.aori.io/developers). Alternatively, please reach out to us [on Discord](https://discord.gg/K37wkh2ZfR) or [on Twitter](https://twitter.com/aori_io).
 
 ## Deployments
+
+### Mainnets
 | Network | Deployment Address |
 | ------- | ------------------ |
 | `Mainnet (1)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
-| `Goerli (5)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Optimism (10)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://optimistic.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
-| `Optimism Goerli (420)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli-optimism.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Base (8453)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://basescan.org/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum (42161)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Avalanche (43114)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://snowtrace.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+
+### Testnets
+| Network | Deployment Address |
+| ------- | ------------------ |
+| `Goerli (5)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Optimism Goerli (420)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli-optimism.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon Mumbai (80001)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://mumbai.polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum Goerli (421613)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum Sepolia (421614)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://sepolia.arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
