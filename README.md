@@ -19,6 +19,7 @@ If you have any further questions, refer to [the technical documentation](https:
 | `Goerli (5)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Optimism (10)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://optimistic.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon (137)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
+| `Optimism Goerli (420)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://goerli-optimism.etherscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Arbitrum (42161)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://arbiscan.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Avalanche (43114)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://snowtrace.io/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |
 | `Polygon Mumbai (80001)` | [0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4](https://mumbai.polygonscan.com/address/0xEF3137050f3a49ECAe2D2Bae0154B895310D9Dc4) |

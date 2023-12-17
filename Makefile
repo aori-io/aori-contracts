@@ -22,3 +22,5 @@ test-deploy-arbitrum-goerli:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://goerli-rollup.arbitrum.io/rpc --via-ir --legacy
 test-deploy-polygon-mumbai:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://rpc.ankr.com/polygon_mumbai --via-ir
+test-deploy-optimism-goerli:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://optimism-goerli.publicnode.com --via-ir
