@@ -1,5 +1,7 @@
 tests:
 	forge test --fork-url https://rpc.ankr.com/eth --via-ir --match-path test/AoriProtocol.t.sol
+
+# Mainnet
 test-deploy-sepolia:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://ethereum-sepolia.publicnode.com --via-ir
 test-deploy-goerli:
@@ -14,3 +16,7 @@ test-deploy-arbitrum:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://arbitrum.llamarpc.com --via-ir
 test-deploy-optimism:
 	forge script script/Deploy.s.sol:DeployScript --fork-url https://optimism.llamarpc.com --via-ir
+
+# Testnets
+test-deploy-arbitrum-goerli:
+	forge script script/Deploy.s.sol:DeployScript --fork-url https://goerli-rollup.arbitrum.io/rpc --via-ir --legacy

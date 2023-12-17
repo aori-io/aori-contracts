@@ -2,7 +2,7 @@
 optimizer_runs = 1_000_000
 verbosity = 1
 remappings = ["seaport-types/=lib/seaport-types/"]
-solc = "0.8.19"
+solc = "0.8.20"
 
 # Extreme Fuzzing CI Profile :P
 [profile.ci]
